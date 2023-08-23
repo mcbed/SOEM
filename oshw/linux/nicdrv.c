@@ -63,7 +63,7 @@ enum
  * differentiate the route the packet traverses through the EtherCAT
  * segment. This is needed to find out the packet flow in redundant
  * configurations. */
-const uint16 priMAC[3] = { 0x0101, 0x0101, 0x0101 };
+uint16 priMAC[3] = { 0x0101, 0x0101, 0x0101 };
 /** Secondary source MAC address used for EtherCAT. */
 const uint16 secMAC[3] = { 0x0404, 0x0404, 0x0404 };
 
@@ -144,6 +144,14 @@ int ecx_setupnic(ecx_portt *port, const char *ifname, int secondary)
    }
    /* we use RAW packet socket, with packet type ETH_P_ECAT */
    *psock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ECAT));
+
+   struct ifreq s;
+   strcpy(s.ifr_name, ifname);
+   if (0 == ioctl(*psock, SIOCGIFHWADDR, &s)) {
+      priMAC[0] = ((uint16_t)s.ifr_addr.sa_data[0] << 8) | (s.ifr_addr.sa_data[1] & 0x00ff);
+      priMAC[1] = ((uint16_t)s.ifr_addr.sa_data[2] << 8) | (s.ifr_addr.sa_data[3] & 0x00ff);
+      priMAC[2] = ((uint16_t)s.ifr_addr.sa_data[4] << 8) | (s.ifr_addr.sa_data[5] & 0x00ff);
+   }
 
    timeout.tv_sec =  0;
    timeout.tv_usec = 1;

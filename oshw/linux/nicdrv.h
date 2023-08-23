@@ -86,7 +86,7 @@ typedef struct
    pthread_mutex_t rx_mutex;
 } ecx_portt;
 
-extern const uint16 priMAC[3];
+extern uint16 priMAC[3];
 extern const uint16 secMAC[3];
 
 #ifdef EC_VER1
